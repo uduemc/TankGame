@@ -97,7 +97,7 @@ abstract class BaseTank {
         this.level = level;
     }
 
-    // ��ȡ̹�˵�width
+    //w
     public int tankWidth() {
         int width;
         if (this.getDirection() == 1 || this.getDirection() == 2) {
@@ -119,7 +119,7 @@ abstract class BaseTank {
         return height;
     }
 
-    // ����size
+    //
     public int levelSize() {
         int size;
         switch (this.getLevel()) {
@@ -141,7 +141,7 @@ abstract class BaseTank {
         return size;
     }
 
-    // �����ϸ
+    //
     public int levelThickness() {
         int thickness;
         switch (this.getLevel()) {
