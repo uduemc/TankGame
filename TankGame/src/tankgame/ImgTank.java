@@ -22,6 +22,44 @@ class ImgTank extends NewTank {
             this.getShots().get(i).draw(gp, imgobs);
         }
     }
+    
+    public static ImgTank enemy1Tank(){
+        ImgTank tank = new ImgTank();
+        tank.setHp(1);
+        tank.setSize(40);
+        tank.setDirection(2);
+        tank.setSpeed(4);
+        tank.setPeople(0);
+        tank.setShot_num(1);
+        tank.setX(0);
+        tank.setY(0);
+        HashMap<String, Image> img = new HashMap<String, Image>();
+        img.put("11", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy1U.gif")));
+        img.put("12", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy1D.gif")));
+        img.put("13", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy1L.gif")));
+        img.put("14", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy1R.gif")));
+        tank.setImg(img);
+        return tank;
+    }
+    
+    public static ImgTank enemy2Tank(){
+        ImgTank tank = new ImgTank();
+        tank.setHp(1);
+        tank.setSize(40);
+        tank.setDirection(2);
+        tank.setSpeed(6);
+        tank.setPeople(0);
+        tank.setShot_num(2);
+        tank.setX(0);
+        tank.setY(0);
+        HashMap<String, Image> img = new HashMap<String, Image>();
+        img.put("11", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy2U.gif")));
+        img.put("12", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy2D.gif")));
+        img.put("13", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy2L.gif")));
+        img.put("14", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy2R.gif")));
+        tank.setImg(img);
+        return tank;
+    }
 
     // people tank
     public static ImgTank peopleTank(int p) {
@@ -31,7 +69,7 @@ class ImgTank extends NewTank {
         tank.setDirection(1);
         tank.setSpeed(4);
         tank.setPeople(p);
-        tank.setShot_num(1);
+        tank.setShot_num(2);
         try {
             tank.setImg(ImgTank.peopleImgSource(p));
         } catch (Exception ex) {

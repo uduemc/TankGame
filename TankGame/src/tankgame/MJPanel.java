@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.LinkedList;
 import java.util.Vector;
 import javax.swing.JPanel;
 
@@ -20,6 +21,8 @@ class MJPanel extends JPanel implements KeyListener, Runnable {
     ImgTank p1 = null;
     Tank p2 = null;
     Vector<ImgTank> pc = new Vector<ImgTank>();
+    LinkedList<ImgTank> tanks = null;
+    TheLevel theLevel = new TheLevel();
 
     MoveThread p1move = null;
     ShotThread p1shot = null;
@@ -29,11 +32,19 @@ class MJPanel extends JPanel implements KeyListener, Runnable {
         this.setPreferredSize(new Dimension(MJPanel.width, MJPanel.height));
         this.setBackground(Color.BLACK);
         p1 = ImgTank.peopleTank(1);//Tank.myTank(); // 创建一个绘制的坦克
+        theLevel.initTanks();
+        pc.add(this.theLevel.getTanks().poll());
     }
 
     public void paint(Graphics gp) {
         super.paint(gp);
+        
+        // 开始
         p1.draw(gp, this);
+        
+        for(int i=0;i<this.pc.size();i++){
+            this.pc.get(i).draw(gp, this);
+        }
     }
 
     @Override
