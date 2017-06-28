@@ -16,7 +16,7 @@ class MJPanel extends JPanel implements KeyListener, Runnable {
     final static int width = 600;
     final static int height = 700;
 
-    Tank p1 = null;
+    ImgTank p1 = null;
     Tank p2 = null;
 
     MoveThread p1move = null;
@@ -26,14 +26,12 @@ class MJPanel extends JPanel implements KeyListener, Runnable {
         this.setLayout(null);
         this.setPreferredSize(new Dimension(MJPanel.width, MJPanel.height));
         this.setBackground(Color.BLACK);
-        p1 = Tank.myTank();
+        p1 = ImgTank.peopleTank(1);//Tank.myTank(); // 创建一个绘制的坦克
     }
 
     public void paint(Graphics gp) {
         super.paint(gp);
-
-        p1.draw(gp);
-        p1.shot(gp);
+        p1.draw(gp, this);
     }
 
     @Override
@@ -45,16 +43,44 @@ class MJPanel extends JPanel implements KeyListener, Runnable {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D) {
-            if (p1move != null && p1move.isLive() == true) {
-                p1move.end();
+
+            if (p1move == null) {
+                p1move = new MoveThread(e.getKeyCode(), this.p1);
+                p1move.start();
+            } else {
+                if (p1move.getKeyCode() != e.getKeyCode()) {
+                    if (p1move.isLive() == true) {
+                        p1move.end();
+                    }
+                    p1move = new MoveThread(e.getKeyCode(), this.p1);
+                    p1move.start();
+                } else {
+                    if (p1move.isLive() == false) {
+                        p1move = new MoveThread(e.getKeyCode(), this.p1);
+                        p1move.start();
+                    }
+                }
             }
-            p1move = new MoveThread(e.getKeyCode(), this.p1);
-            p1move.start();
         }
 
         if (e.getKeyCode() == KeyEvent.VK_J) {
-            p1shot = new ShotThread(e.getKeyCode(), this.p1);
-            p1shot.start();
+            if (p1shot == null) {
+                p1shot = new ShotThread(e.getKeyCode(), this.p1);
+                p1shot.start();
+            } else {
+                if (p1shot.getKeyCode() != e.getKeyCode()) {
+                    if (p1shot.isLive() == true) {
+                        p1shot.end();
+                    }
+                    p1shot = new ShotThread(e.getKeyCode(), this.p1);
+                    p1shot.start();
+                } else {
+                    if (p1shot.isLive() == false) {
+                        p1shot = new ShotThread(e.getKeyCode(), this.p1);
+                        p1shot.start();
+                    }
+                }
+            }
         }
 
     }
@@ -62,10 +88,11 @@ class MJPanel extends JPanel implements KeyListener, Runnable {
     // 抬起
     @Override
     public void keyReleased(KeyEvent e) {
-        if ( p1move != null && p1move.getKeyCode() == e.getKeyCode()) {
+        if (p1move != null && p1move.getKeyCode() == e.getKeyCode()) {
             p1move.end();
         }
-        if ( p1shot != null && p1shot.getKeyCode() == e.getKeyCode()) {
+
+        if (p1shot != null && p1shot.getKeyCode() == e.getKeyCode()) {
             p1shot.end();
         }
 
@@ -87,7 +114,9 @@ class MJPanel extends JPanel implements KeyListener, Runnable {
 
 class ShotThread extends BaseThread {
 
-    public ShotThread(int code, Tank tk) {
+    private int fire = 0;
+
+    public ShotThread(int code, ImgTank tk) {
         super(code, tk);
     }
 
@@ -104,7 +133,13 @@ class ShotThread extends BaseThread {
             }
 
             if (this.getKeyCode() == KeyEvent.VK_J) {
-                this.getTk().fire();
+                if (this.getFire() <= 0) {
+                    this.getTk().fire();
+                    this.setFire(2);
+                } else {
+                    this.setFire(this.getFire() - 1);
+                }
+
             }
 
             if (!this.isLive()) {
@@ -112,11 +147,25 @@ class ShotThread extends BaseThread {
             }
         }
     }
+
+    /**
+     * @return the fire
+     */
+    public int getFire() {
+        return fire;
+    }
+
+    /**
+     * @param fire the fire to set
+     */
+    public void setFire(int fire) {
+        this.fire = fire;
+    }
 }
 
 class MoveThread extends BaseThread {
 
-    public MoveThread(int code, Tank tk) {
+    public MoveThread(int code, ImgTank tk) {
         super(code, tk);
     }
 
@@ -127,31 +176,28 @@ class MoveThread extends BaseThread {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(50);
+                Thread.sleep(40);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             if (this.getKeyCode() == KeyEvent.VK_W) {
                 this.getTk().setDirection(1);
-                this.getTk().moveW();
+                this.getTk().moveU();
             }
 
             if (this.getKeyCode() == KeyEvent.VK_S) {
-                // ��
                 this.getTk().setDirection(2);
-                this.getTk().moveS();
+                this.getTk().moveD();
             }
 
             if (this.getKeyCode() == KeyEvent.VK_A) {
-                // ��
                 this.getTk().setDirection(3);
-                this.getTk().moveA();
+                this.getTk().moveL();
             }
 
             if (this.getKeyCode() == KeyEvent.VK_D) {
-                // ��
                 this.getTk().setDirection(4);
-                this.getTk().moveD();
+                this.getTk().moveR();
             }
 
             if (!this.isLive()) {
@@ -166,9 +212,9 @@ class BaseThread extends Thread {
 
     private int keyCode;
     private boolean live = true;
-    private Tank tk;
+    private ImgTank tk;
 
-    public BaseThread(int code, Tank tk) {
+    public BaseThread(int code, ImgTank tk) {
         this.keyCode = code;
         this.tk = tk;
     }
@@ -204,14 +250,14 @@ class BaseThread extends Thread {
     /**
      * @return the tk
      */
-    public Tank getTk() {
+    public ImgTank getTk() {
         return tk;
     }
 
     /**
      * @param tk the tk to set
      */
-    public void setTk(Tank tk) {
+    public void setTk(ImgTank tk) {
         this.tk = tk;
     }
 }
