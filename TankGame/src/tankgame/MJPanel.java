@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Vector;
 import javax.swing.JPanel;
 
 /**
@@ -18,6 +19,7 @@ class MJPanel extends JPanel implements KeyListener, Runnable {
 
     ImgTank p1 = null;
     Tank p2 = null;
+    Vector<ImgTank> pc = new Vector<ImgTank>();
 
     MoveThread p1move = null;
     ShotThread p1shot = null;
