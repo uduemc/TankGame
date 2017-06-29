@@ -14,6 +14,7 @@ import java.util.LinkedList;
 public class TheLevel {
 
     private int level = 1;
+    private int time = 80;
     private LinkedList<ImgTank> tanks = new LinkedList<ImgTank>();
 
     public void initTanks() {
@@ -61,5 +62,29 @@ public class TheLevel {
      */
     public void setTanks(LinkedList<ImgTank> tanks) {
         this.tanks = tanks;
+    }
+
+    /**
+     * @return the time
+     */
+    public int getTime() {
+        return time;
+    }
+
+    /**
+     * @param time the time to set
+     */
+    public void setTime(int time) {
+        this.time = time;
+    }
+
+    public void initTime() {
+        this.setTime(80);
+    }
+
+    public int timer() {
+        int timer = this.getTime();
+        this.setTime(timer - 1);
+        return timer;
     }
 }

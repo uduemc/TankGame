@@ -14,16 +14,30 @@ class ImgTank extends NewTank {
 
     @Override // 画画
     public void draw(Graphics gp, MJPanel imgobs) {
-        String key = String.valueOf(this.getHp()) + String.valueOf(this.getDirection());
-        HashMap<String, Image> imgs = this.getImg();
-        gp.drawImage(imgs.get(key), this.getX(), this.getY(), this.getSize(), this.getSize(), imgobs);
-        // 画子弹
-        for (int i = 0; i < this.getShots().size(); i++) {
-            this.getShots().get(i).draw(gp, imgobs);
+        if (this.isInit()) {
+            // 坦克出生时的动态图片效果。并且这个时候坦克不能移动
+            gp.drawImage(this.getInitimg()[this.getInitimer() % 4], this.getX(), this.getY(), this.getSize(), this.getSize(), imgobs);
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ImgTank.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            this.setInitimer(this.getInitimer() - 1);
+            if(this.getInitimer() <= 0){
+                this.setInit(false);
+            }
+        } else {
+            String key = String.valueOf(this.getHp()) + String.valueOf(this.getDirection());
+            HashMap<String, Image> imgs = this.getImg();
+            gp.drawImage(imgs.get(key), this.getX(), this.getY(), this.getSize(), this.getSize(), imgobs);
+            // 画子弹
+            for (int i = 0; i < this.getShots().size(); i++) {
+                this.getShots().get(i).draw(gp, imgobs);
+            }
         }
     }
-    
-    public static ImgTank enemy1Tank(){
+
+    public static ImgTank enemy1Tank() {
         ImgTank tank = new ImgTank();
         tank.setHp(1);
         tank.setSize(40);
@@ -41,8 +55,8 @@ class ImgTank extends NewTank {
         tank.setImg(img);
         return tank;
     }
-    
-    public static ImgTank enemy2Tank(){
+
+    public static ImgTank enemy2Tank() {
         ImgTank tank = new ImgTank();
         tank.setHp(1);
         tank.setSize(40);
@@ -109,7 +123,8 @@ class ImgTank extends NewTank {
     }
 
     public void fire() {
-        if (this.getShots().size() < this.getShot_num()) {
+        
+        if (this.getShots().size() < this.getShot_num() && this.isInit() == false) {
             Image img;
             // 创建一颗子弹放入到子弹向量中
             if (this.getPeople() == 0) {
@@ -117,41 +132,50 @@ class ImgTank extends NewTank {
             } else {
                 img = Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/tankmissile.gif"));
             }
+            Sound.play(this.getClass().getResource("").getPath() + "source/fire.wav");
             this.getShots().add(new ImgShot(this, img));
         }
 
     }
 
     public void moveU() {
-        int y = this.getY() - this.getSpeed();
-        if (y < 0) {
-            y = 0;
+        if (this.isInit() == false) {
+            int y = this.getY() - this.getSpeed();
+            if (y < 0) {
+                y = 0;
+            }
+            this.setY(y);
         }
-        this.setY(y);
     }
 
     public void moveD() {
-        int y = this.getY() + this.getSpeed();
-        if (y > MJPanel.height - this.getSize()) {
-            y = MJPanel.height - this.getSize();
+        if (this.isInit() == false) {
+            int y = this.getY() + this.getSpeed();
+            if (y > MJPanel.height - this.getSize()) {
+                y = MJPanel.height - this.getSize();
+            }
+            this.setY(y);
         }
-        this.setY(y);
     }
 
     public void moveL() {
-        int x = this.getX() - this.getSpeed();
-        if (x < 0) {
-            x = 0;
+        if (this.isInit() == false) {
+            int x = this.getX() - this.getSpeed();
+            if (x < 0) {
+                x = 0;
+            }
+            this.setX(x);
         }
-        this.setX(x);
     }
 
     public void moveR() {
-        int x = this.getX() + this.getSpeed();
-        if (x > MJPanel.width - this.getSize()) {
-            x = MJPanel.width - this.getSize();
+        if (this.isInit() == false) {
+            int x = this.getX() + this.getSpeed();
+            if (x > MJPanel.width - this.getSize()) {
+                x = MJPanel.width - this.getSize();
+            }
+            this.setX(x);
         }
-        this.setX(x);
     }
 }
 
@@ -167,6 +191,16 @@ abstract class NewTank {
     private int shot_num = 2;
     private Vector<ImgShot> shots = new Vector<ImgShot>();
     private HashMap<String, Image> img = new HashMap<String, Image>();
+    private boolean init = true;
+    private int initimer = 16;
+    private Image[] initimg = new Image[4];
+
+    public NewTank() {
+        initimg[0] = Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/born1.gif"));
+        initimg[1] = Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/born2.gif"));
+        initimg[2] = Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/born3.gif"));
+        initimg[3] = Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/born4.gif"));
+    }
 
     /**
      * @return the hp
@@ -319,4 +353,48 @@ abstract class NewTank {
     public void setPeople(int people) {
         this.people = people;
     }
+
+    /**
+     * @return the init
+     */
+    public boolean isInit() {
+        return init;
+    }
+
+    /**
+     * @param init the init to set
+     */
+    public void setInit(boolean init) {
+        this.init = init;
+    }
+
+    /**
+     * @return the initimer
+     */
+    public int getInitimer() {
+        return initimer;
+    }
+
+    /**
+     * @return the initimg
+     */
+    public Image[] getInitimg() {
+
+        return initimg;
+    }
+
+    /**
+     * @param initimer the initimer to set
+     */
+    public void setInitimer(int initimer) {
+        this.initimer = initimer;
+    }
+
+    /**
+     * @param initimg the initimg to set
+     */
+    public void setInitimg(Image[] initimg) {
+        this.initimg = initimg;
+    }
+
 }

@@ -38,7 +38,6 @@ public class ImgShot extends NewShot implements Runnable {
     public void run() {
         if (this.isMove()) {
             while (true) {
-
                 switch (this.getDirection()) {
                     case 1:
                         this.setY(this.getY() - this.getSpeed());
@@ -56,12 +55,13 @@ public class ImgShot extends NewShot implements Runnable {
 
                 // 判断自动是否遇到墙壁
                 if (this.getX() < 0 || this.getX() > MJPanel.width || this.getY() < 0 || this.getY() > MJPanel.height) {
+                    // 子弹碰撞
+                    Sound.play(this.getClass().getResource("").getPath() + "source/hit.wav");
                     this.setMove(false);
                     this.getTank().getShots().remove(this);
                 }
-                
-                // 判断是否遇到敌对坦克
 
+                // 判断是否遇到敌对坦克
                 if (!this.isMove()) {
                     break;
                 }
