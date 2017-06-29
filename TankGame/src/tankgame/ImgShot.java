@@ -55,8 +55,7 @@ public class ImgShot extends NewShot implements Runnable {
 
                 // 判断自动是否遇到墙壁
                 if (this.getX() < 0 || this.getX() > MJPanel.width || this.getY() < 0 || this.getY() > MJPanel.height) {
-                    // 子弹碰撞
-                    Sound.play(this.getClass().getResource("").getPath() + "source/hit.wav");
+                    
                     this.setMove(false);
                     this.getTank().getShots().remove(this);
                 }

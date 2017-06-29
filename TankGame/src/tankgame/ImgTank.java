@@ -23,7 +23,7 @@ class ImgTank extends NewTank {
                 Logger.getLogger(ImgTank.class.getName()).log(Level.SEVERE, null, ex);
             }
             this.setInitimer(this.getInitimer() - 1);
-            if(this.getInitimer() <= 0){
+            if (this.getInitimer() <= 0) {
                 this.setInit(false);
             }
         } else {
@@ -123,7 +123,7 @@ class ImgTank extends NewTank {
     }
 
     public void fire() {
-        
+
         if (this.getShots().size() < this.getShot_num() && this.isInit() == false) {
             Image img;
             // 创建一颗子弹放入到子弹向量中
