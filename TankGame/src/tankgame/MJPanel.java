@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Panel;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -46,6 +47,8 @@ class MJPanel extends JPanel implements KeyListener, Runnable {
     boolean once = true;
     // 爆炸
     ArrayList<DrawBlast> dBlast = new ArrayList<DrawBlast>();
+    // 出生点
+    private int pcOutPosition = 3;
 
     public MJPanel() {
         this.setLayout(null);
@@ -53,45 +56,49 @@ class MJPanel extends JPanel implements KeyListener, Runnable {
         this.setBackground(Color.BLACK);
         p1 = ImgTank.peopleTank(1);//Tank.myTank(); // 创建一个绘制的坦克
         theLevel.initTanks();
-        pc.add(this.theLevel.getTanks().poll());
     }
 
     public void paint(Graphics gp) {
         super.paint(gp);
-        // 显示关卡
-        if (!this.showLevel(gp)) {
-
-            // 判断这个坦克是否生命值大于0
-            if (p1.getHp() > 0) {
-                p1.draw(gp, this);
-            } else {
-                System.out.println("游戏结束");
-            }
-
-            for (int i = 0; i < this.pc.size(); i++) {
-                if (this.pc.get(i).getHp() > 0) {
-                    this.pc.get(i).draw(gp, this);
+        if (p1 != null) {
+            // 显示关卡
+            if (!this.showLevel(gp)) {
+                // 判断这个坦克是否生命值大于0
+                if (p1.getHp() > 0) {
+                    p1.draw(gp, this);
                 } else {
-                    int x = this.pc.get(i).getX();
-                    int y = this.pc.get(i).getY();
-                    dBlast.add(new DrawBlast(x, y));
-                    this.pc.remove(this.pc.get(i));
+                    dBlast.add(new DrawBlast(p1.getX(), p1.getY()));
+                    p1 = null;
+                }
+
+                for (int i = 0; i < this.pc.size(); i++) {
+                    // 检测坦克的Hp是否大于0.如果小于0则剔除该坦克
+                    if (this.pc.get(i).getHp() > 0) {
+                        this.pc.get(i).draw(gp, this);
+                    } else {
+                        int x = this.pc.get(i).getX();
+                        int y = this.pc.get(i).getY();
+                        dBlast.add(new DrawBlast(x, y));
+                        this.pc.remove(this.pc.get(i));
+                    }
                 }
             }
-        }
 
-        // 击中
-        Blast.draw(gp);
+            // 击中
+            Blast.draw(gp);
 
-        // 画爆炸效果
-        Iterator<DrawBlast> itBlast = this.dBlast.iterator();
-        while (itBlast.hasNext()) {
-            DrawBlast tmp = itBlast.next();
-            if (tmp.getTimer() > 0) {
-                gp.drawImage(tmp.getImage(), tmp.getX(), tmp.getY(), 40, 40, this);
-            } else {
-                itBlast.remove();
+            // 画爆炸效果
+            Iterator<DrawBlast> itBlast = this.dBlast.iterator();
+            while (itBlast.hasNext()) {
+                DrawBlast tmp = itBlast.next();
+                if (tmp.getTimer() > 0) {
+                    gp.drawImage(tmp.getImage(), tmp.getX(), tmp.getY(), 40, 40, this);
+                } else {
+                    itBlast.remove();
+                }
             }
+        } else {
+            gp.drawImage(Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/over.gif")), (this.width - 320) / 2, (this.height - 180) / 2, 320, 180, this);
         }
 
     }
@@ -191,14 +198,46 @@ class MJPanel extends JPanel implements KeyListener, Runnable {
     @Override
     public void run() {
         while (true) {
+
             try {
                 Thread.sleep(20);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Blast.runtimes(this.p1, this.p2, this.pc);
+            if (p1 != null) {
+                Blast.runtimes(this.p1, this.p2, this.pc);
+
+                // 通过 关卡 将坦克加入 pc 中 
+                if (this.pc.size() < this.theLevel.getTanknum() && this.theLevel.getTanks().size() > 0) {
+                    ImgTank tank = this.theLevel.getTanks().poll();
+                    switch (this.getPcOutPosition()) {
+                        case 0:
+                            tank.setX(0);
+                            tank.setY(0);
+                            break;
+                        case 1:
+                            tank.setX(MJPanel.width / 2 - tank.getSize() / 2);
+                            tank.setY(0);
+                            break;
+                        case 2:
+                            tank.setX(MJPanel.width - tank.getSize());
+                            tank.setY(0);
+                            break;
+                    }
+                    pc.add(tank);
+                }
+            }
             this.repaint();
         }
+    }
+
+    /**
+     * @return the pcOutPosition
+     */
+    public int getPcOutPosition() {
+        int position = this.pcOutPosition;
+        this.pcOutPosition++;
+        return position % 3;
     }
 }
 

@@ -15,6 +15,7 @@ public class TheLevel {
 
     private int level = 1;
     private int time = 80;
+    private int tanknum;
     private LinkedList<ImgTank> tanks = new LinkedList<ImgTank>();
 
     public void initTanks() {
@@ -27,7 +28,8 @@ public class TheLevel {
 
     // 第一关敌人的坦克
     public void level_1() {
-        // tanks.offer();
+        // 场面上同时拥有的坦克数量
+        this.setTanknum(2);
         for (int i = 0; i < 18; i++) {
             getTanks().offer(ImgTank.enemy1Tank());
         }
@@ -86,5 +88,19 @@ public class TheLevel {
         int timer = this.getTime();
         this.setTime(timer - 1);
         return timer;
+    }
+
+    /**
+     * @return the tanknum
+     */
+    public int getTanknum() {
+        return tanknum;
+    }
+
+    /**
+     * @param tanknum the tanknum to set
+     */
+    public void setTanknum(int tanknum) {
+        this.tanknum = tanknum;
     }
 }

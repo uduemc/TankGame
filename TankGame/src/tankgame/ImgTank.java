@@ -6,6 +6,7 @@ import java.awt.Panel;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,6 +54,7 @@ class ImgTank extends NewTank {
         img.put("13", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy1L.gif")));
         img.put("14", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy1R.gif")));
         tank.setImg(img);
+        tank.start();
         return tank;
     }
 
@@ -72,6 +74,7 @@ class ImgTank extends NewTank {
         img.put("13", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy2L.gif")));
         img.put("14", Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/enemy2R.gif")));
         tank.setImg(img);
+        tank.start();
         return tank;
     }
 
@@ -177,9 +180,67 @@ class ImgTank extends NewTank {
             this.setX(x);
         }
     }
+
+    public void run() {
+        while (true) {
+            if (this.getHp() < 1) {
+                break;
+            }
+
+            int d = (int) (Math.random() * 4) + 1;
+            this.setDirection(d);
+            int max = 20;
+            int min = 10;
+            Random random = new Random();
+            int time = random.nextInt(max) % (max - min + 1) + min;
+            switch (d) {
+                case 1:
+                    for (int i = 0; i < time; i++) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        this.moveU();
+                    }
+                    break;
+                case 2:
+                    for (int i = 0; i < time; i++) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        this.moveD();
+                    }
+                    break;
+                case 3:
+                    for (int i = 0; i < time; i++) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        this.moveL();
+                    }
+                    break;
+                case 4:
+                    for (int i = 0; i < time; i++) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        this.moveR();
+                    }
+                    break;
+            }
+            this.fire();
+        }
+    }
 }
 
-abstract class NewTank {
+abstract class NewTank extends Thread {
 
     private int x;
     private int y;

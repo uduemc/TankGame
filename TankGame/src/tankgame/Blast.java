@@ -19,17 +19,34 @@ public class Blast {
 
     // 检测有子弹击中坦克时的情况
     public static void runtimes(ImgTank p1, ImgTank p2, Vector<ImgTank> pc) {
-        // 验证 p1 的子弹是否打中敌人
-        Iterator<ImgShot> it = p1.getShots().iterator();
-        while (it.hasNext()) {
-            ImgShot stmp = it.next();
+        if (p1 != null) {
+            // 验证 p1 的子弹是否打中敌人
+            Iterator<ImgShot> it = p1.getShots().iterator();
+            while (it.hasNext()) {
+                ImgShot stmp = it.next();
+                // 敌人坦克
+                Iterator<ImgTank> tk = pc.iterator();
+                while (tk.hasNext()) {
+                    ImgTank ttmp = tk.next();
+                    // 是否有碰到
+                    if (ttmp.isInit() == false && Blast.isBlast(stmp, ttmp)) {
+                        Blast.self().add(p1, stmp, ttmp);
+                    }
+                }
+            }
+
+            // 敌方坦克的子弹是否打中你
             // 敌人坦克
             Iterator<ImgTank> tk = pc.iterator();
             while (tk.hasNext()) {
                 ImgTank ttmp = tk.next();
-                // 是否有碰到
-                if (Blast.isBlast(stmp, ttmp)) {
-                    Blast.self().add(p1, stmp, ttmp);
+                Iterator<ImgShot> sit = ttmp.getShots().iterator();
+                while (sit.hasNext()) {
+                    ImgShot stmp = sit.next();
+                    // 是否有碰到
+                    if (p1.isInit() == false && Blast.isBlast(stmp, p1)) {
+                        Blast.self().add(ttmp, stmp, p1);
+                    }
                 }
             }
         }
@@ -53,7 +70,7 @@ public class Blast {
     // 检测子弹跟坦克是否有碰撞
     public static boolean isBlast(ImgShot shot, ImgTank tank) {
         boolean bool = false;
-        if ((shot.getX() > (tank.getX() - shot.getSize()) && shot.getX() < (tank.getX() + tank.getSize() + shot.getSize())) && (shot.getY() < (tank.getY() + tank.getSize() + shot.getSize()) && shot.getY() > (tank.getY() - shot.getY()))) {
+        if ((shot.getX() > (tank.getX() - shot.getSize() + 2) && shot.getX() < (tank.getX() + tank.getSize() + shot.getSize() - 2)) && (shot.getY() < (tank.getY() + tank.getSize() + shot.getSize() - 2) && shot.getY() > (tank.getY() - shot.getSize() + 2))) {
             bool = true;
         }
         return bool;
@@ -96,37 +113,30 @@ class DrawBlast extends Thread {
         this.x = x;
         this.y = y;
     }
-    
-    public Image getImage(){
-        if(this.getTimer() == 41){
+
+    public Image getImage() {
+        if (this.getTimer() == 41) {
             Sound.play(Sound.class.getResource("").getPath() + "source/blast.wav");
         }
         this.timer();
-        if(this.getTimer() > 35){
+        if (this.getTimer() > 35) {
             return Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/blast8.gif"));
-        }
-        else if(this.getTimer() > 30){
+        } else if (this.getTimer() > 30) {
             return Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/blast7.gif"));
-        }
-        else if(this.getTimer() > 25){
+        } else if (this.getTimer() > 25) {
             return Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/blast6.gif"));
-        }
-        else if(this.getTimer() > 20){
+        } else if (this.getTimer() > 20) {
             return Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/blast5.gif"));
-        }
-        else if(this.getTimer() > 15){
+        } else if (this.getTimer() > 15) {
             return Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/blast4.gif"));
-        }
-        else if(this.getTimer() > 10){
+        } else if (this.getTimer() > 10) {
             return Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/blast3.gif"));
-        }
-        else if(this.getTimer() > 5){
+        } else if (this.getTimer() > 5) {
             return Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/blast2.gif"));
-        }
-        else{
+        } else {
             return Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/tankgame/source/blast1.gif"));
         }
-        
+
     }
 
     public void timer() {
